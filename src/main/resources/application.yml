@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: third-party-pay-demo
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    default-property-inclusion: non_null  #返回的json数据，空字段不返回
+
+server:
+  port: 8080
+  publicAddress: http://127.0.0.1:8080 #应用公网地址
+
+#支付宝参数
+alipay:
+  serverUrl: https://openapi.alipay.com/gateway.do
+  appId:
+  privateKey:
+  alipayPublicKey:
