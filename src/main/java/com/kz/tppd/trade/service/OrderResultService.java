@@ -23,17 +23,20 @@ public class OrderResultService {
 
         //处理中或未支付，跳过不处理
         if(responseDTO.isProcessing() || responseDTO.isNotPay()){
+            log.info("未支付");
             //TODO 变更下次定时查询时间
             return;
         }
 
         //支付成功
         if(responseDTO.isSuccess()){
+            log.info("支付成功");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁，保证幂等性），支付成功业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
         }
         //支付失败
         else {
+            log.info("支付失败");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁），支付失败业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
             //通道错误码：responseDTO.getErrorCode()
@@ -51,17 +54,20 @@ public class OrderResultService {
 
         //处理中，跳过不处理
         if(responseDTO.isProcessing()){
+            log.info("退款处理中");
             //TODO 变更下次定时查询时间
             return;
         }
 
         //退款成功
         if(responseDTO.isSuccess()){
+            log.info("退款成功");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁，保证幂等性），退款成功业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
         }
         //退款失败
         else {
+            log.info("退款失败");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁），退款失败业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
             //通道错误码：responseDTO.getErrorCode()

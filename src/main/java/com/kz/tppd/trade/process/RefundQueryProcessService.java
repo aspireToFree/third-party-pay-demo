@@ -1,5 +1,6 @@
 package com.kz.tppd.trade.process;
 
+import com.alibaba.fastjson.JSON;
 import com.kz.tppd.common.enums.CommonErrorEnum;
 import com.kz.tppd.common.exceptions.BaseException;
 import com.kz.tppd.gateway.service.ChannelPayDispatcherService;
@@ -47,7 +48,7 @@ public class RefundQueryProcessService {
         //订单查询决策
         tradeDecisionService.orderQueryDecision(requestDTO);
 
-        log.info("退款订单查询 requestDTO：{}" , requestDTO);
+        log.info("退款订单查询 requestDTO：{}" , JSON.toJSONString(requestDTO));
 
         RefundQueryResponseDTO responseDTO;
         try{
@@ -65,7 +66,7 @@ public class RefundQueryProcessService {
             log.error("GATEWAY退款订单查询异常", e);
             throw new BaseException(CommonErrorEnum.CALL_REFUND_QUERY_FAIL);
         }
-        log.info("退款订单查询 responseDTO：{}" , responseDTO);
+        log.info("退款订单查询 responseDTO：{}" , JSON.toJSONString(responseDTO));
 
         //退款订单结果公共处理
         orderResultProcess.refundOrderResultProcess(responseDTO);

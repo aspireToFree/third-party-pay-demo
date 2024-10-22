@@ -24,7 +24,6 @@ import com.kz.tppd.trade.dto.request.*;
 import com.kz.tppd.trade.dto.response.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -86,8 +85,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
             // 设置产品码
             model.setProductCode("JSAPI_PAY");
 
-            // buyer_id 或 buyer_open_id
-            model.setOpAppId(requestDTO.getOpenId());
+            if(StringUtils.isNotBlank(requestDTO.getBuyerId())){
+                model.setBuyerId(requestDTO.getBuyerId());
+            } else if(StringUtils.isNotBlank(requestDTO.getOpenId())){
+                model.setBuyerOpenId(requestDTO.getOpenId());
+            }
         }
         //支付宝APP支付
         else if(PayMethodEnum.ALIPAY_APP.equals(requestDTO.getPayMethodEnum())){
@@ -121,7 +123,10 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
 
         //调用失败
         if (!response.isSuccess()) {
-            return (UnifiedOrderResponseDTO) getFailResponseDTO(response);
+            UnifiedOrderResponseDTO responseDTO = new UnifiedOrderResponseDTO();
+            responseDTO.setChannelOrderNo(response.getTradeNo());
+            setFailResponseDTO(responseDTO , response);
+            return responseDTO;
         }
 
         UnifiedOrderResponseDTO responseDTO = new UnifiedOrderResponseDTO();
@@ -165,11 +170,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
 
         AlipayTradeQueryResponse response;
         try {
-            log.info(label + " 请求参数:{}", ToStringBuilder.reflectionToString(request));
+            log.info(label + " 请求参数:{}", JSON.toJSONString(request));
 
             response = alipayClient.execute(request);
 
-            log.info(label + " 返回参数:{}", ToStringBuilder.reflectionToString(response));
+            log.info(label + " 返回参数:{}", JSON.toJSONString(response));
         } catch (AlipayApiException e) {
             //超时等其他异常，抛出异常，不修改自己系统的业务结果
             throw new BaseException(CommonErrorEnum.CHANNEL_ERROR, e);
@@ -239,11 +244,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
 
         AlipayTradeRefundResponse response;
         try {
-            log.info(label + " 请求参数:{}", ToStringBuilder.reflectionToString(request));
+            log.info(label + " 请求参数:{}", JSON.toJSONString(request));
 
             response = alipayClient.execute(request);
 
-            log.info(label + " 返回参数:{}", ToStringBuilder.reflectionToString(response));
+            log.info(label + " 返回参数:{}", JSON.toJSONString(response));
         } catch (AlipayApiException e) {
             log.error("支付宝退款异常" , e);
             //超时等异常，先当做退款请求成功，通过退款查询来确认最终结果，防止重复退款，造成资金损失
@@ -252,11 +257,14 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
 
         //调用失败
         if (!response.isSuccess()) {
-            return (RefundResponseDTO) getFailResponseDTO(response);
+            RefundResponseDTO responseDTO = new RefundResponseDTO();
+            responseDTO.setChannelOrderNo(response.getTradeNo());
+            setFailResponseDTO(responseDTO , response);
+            return responseDTO;
         }
 
-        //只是退款请求成功，真正的退款结果，需要另外查询
-        RefundResponseDTO refundResponseDTO = new RefundResponseDTO();
+        //TODO 只是退款请求成功，真正的退款结果，需要另外查询
+        RefundResponseDTO refundResponseDTO = new RefundResponseDTO(ChannelStatusEnum.REQUEST_SUCCESS);
         //通道订单号
         refundResponseDTO.setChannelOrderNo(response.getTradeNo());
         return refundResponseDTO;
@@ -276,8 +284,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         AlipayTradeFastpayRefundQueryModel model = new AlipayTradeFastpayRefundQueryModel();
 
         // 设置订单号
-        model.setOutTradeNo(requestDTO.getOrderNo());
-        model.setTradeNo(requestDTO.getChannelOrderNo());
+        model.setOutRequestNo(requestDTO.getOrderNo());
+
+        //原支付订单号
+        model.setOutTradeNo(requestDTO.getOriginalOrderNo());
+        model.setTradeNo(requestDTO.getOriginalChannelOrderNo());
 
         request.setBizModel(model);
 
@@ -285,11 +296,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
 
         AlipayTradeFastpayRefundQueryResponse response;
         try {
-            log.info(label + " 请求参数:{}", ToStringBuilder.reflectionToString(request));
+            log.info(label + " 请求参数:{}", JSON.toJSONString(request));
 
             response = alipayClient.execute(request);
 
-            log.info(label + " 返回参数:{}", ToStringBuilder.reflectionToString(response));
+            log.info(label + " 返回参数:{}", JSON.toJSONString(response));
         } catch (AlipayApiException e) {
             //超时等其他异常，抛出异常，不修改自己系统的业务结果
             throw new BaseException(CommonErrorEnum.CHANNEL_ERROR, e);
@@ -328,6 +339,11 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         alipayConfig.setPrivateKey(privateKey);
         alipayConfig.setAlipayPublicKey(alipayPublicKey);
 
+        if(alipayConfig.getServerUrl().contains("openapi-sandbox.dl.alipaydev.com")){
+            log.info("当前为支付宝沙箱环境");
+        }
+
+        log.info("serverUrl：{}，appId：{}" , alipayConfig.getServerUrl() , alipayConfig.getAppId());
         try {
             return new DefaultAlipayClient(alipayConfig);
         } catch (AlipayApiException e) {
@@ -336,13 +352,13 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
     }
 
     /**
-     * 获取错误返回参数DTO
+     * 设置错误返回参数DTO
      * @param response 支付宝返回参数
-     * @return 返回参数DTO
      * Created by kz on 2024/10/6 17:44.
      */
-    private BasePayResponseDTO getFailResponseDTO(AlipayResponse response){
-        return new BasePayResponseDTO(ChannelStatusEnum.FAIL , StringUtils.isNotBlank(response.getSubCode())?response.getSubCode():response.getCode()
-                , StringUtils.isNotBlank(response.getSubMsg())?response.getSubMsg():response.getMsg());
+    private void setFailResponseDTO(BasePayResponseDTO responseDTO , AlipayResponse response){
+        responseDTO.setChannelStatusEnum(ChannelStatusEnum.FAIL);
+        responseDTO.setErrorCode(StringUtils.isNotBlank(response.getSubCode())?response.getSubCode():response.getCode());
+        responseDTO.setErrorMessage(StringUtils.isNotBlank(response.getSubMsg())?response.getSubMsg():response.getMsg());
     }
 }

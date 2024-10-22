@@ -1,5 +1,6 @@
 package com.kz.tppd.trade.process;
 
+import com.alibaba.fastjson.JSON;
 import com.kz.tppd.common.enums.CommonErrorEnum;
 import com.kz.tppd.common.exceptions.BaseException;
 import com.kz.tppd.gateway.service.ChannelPayDispatcherService;
@@ -47,7 +48,7 @@ public class PayOrderQueryProcessService {
         //订单查询决策
         tradeDecisionService.orderQueryDecision(requestDTO);
 
-        log.info("支付订单查询 requestDTO：{}", requestDTO);
+        log.info("支付订单查询 requestDTO：{}", JSON.toJSONString(requestDTO));
 
         PayOrderQueryResponseDTO responseDTO;
         try {
@@ -66,7 +67,7 @@ public class PayOrderQueryProcessService {
             throw new BaseException(CommonErrorEnum.CALL_PAY_ORDER_QUERY_FAIL);
         }
 
-        log.info("支付订单查询 responseDTO：{}", responseDTO);
+        log.info("支付订单查询 responseDTO：{}", JSON.toJSONString(responseDTO));
 
         //支付订单结果公共处理
         orderResultProcess.payOrderResultProcess(responseDTO);

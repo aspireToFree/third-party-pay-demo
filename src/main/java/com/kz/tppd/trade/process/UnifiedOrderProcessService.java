@@ -77,13 +77,13 @@ public class UnifiedOrderProcessService {
 
         log.info("统一下单 responseDTO：{}" , JSON.toJSONString(responseDTO));
 
-        //下单成功
         if(responseDTO.isSuccess()){
+            log.info("下单成功");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁，保证幂等性），下单成功业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
         }
-        //下单失败
         else {
+            log.info("下单失败");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁），下单失败业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
             //通道错误码：responseDTO.getErrorCode()

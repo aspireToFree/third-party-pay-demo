@@ -17,7 +17,10 @@ public class UnifiedOrderRequestDTO extends BasePayRequestDTO {
 
     private static final long serialVersionUID = -1231673879653150825L;
 
-    /** openId **/
+    /** 买家支付宝用户ID **/
+    private String buyerId;
+
+    /** openId（微信openId 或 买家支付宝用户唯一标识） **/
     private String openId;
 
     /** appId **/

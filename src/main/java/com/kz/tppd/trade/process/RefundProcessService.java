@@ -1,5 +1,6 @@
 package com.kz.tppd.trade.process;
 
+import com.alibaba.fastjson.JSON;
 import com.kz.tppd.common.enums.CommonErrorEnum;
 import com.kz.tppd.common.exceptions.BaseException;
 import com.kz.tppd.gateway.service.ChannelPayDispatcherService;
@@ -33,7 +34,7 @@ public class RefundProcessService {
      * @return 返回参数DTO
      * Created by kz on 2021/11/8 10:49.
      */
-    private RefundResponseDTO executeProcess(RefundRequestDTO requestDTO){
+    public RefundResponseDTO executeProcess(RefundRequestDTO requestDTO){
         //TODO 业务参数校验（字段是否必传...）
         //TODO 校验订单能否退款，支付订单是否支付，支付订单能退款的金额。。。
 
@@ -51,7 +52,7 @@ public class RefundProcessService {
         //订单查询决策
         tradeDecisionService.orderQueryDecision(requestDTO);
 
-        log.info("退款 requestDTO：{}" , requestDTO);
+        log.info("退款 requestDTO：{}" , JSON.toJSONString(requestDTO));
 
         //TODO 数据登记到支付订单表、其他业务表
 
@@ -71,15 +72,14 @@ public class RefundProcessService {
             log.error("GATEWAY退款异常", e);
             throw new BaseException(CommonErrorEnum.CALL_REFUND_FAIL);
         }
-        log.info("退款 responseDTO：{}" , responseDTO);
+        log.info("退款 responseDTO：{}" , JSON.toJSONString(responseDTO));
 
-        //退款请求成功
         if(responseDTO.isSuccess()) {
+            log.info("退款请求成功");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁，保证幂等性），退款请求成功业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
-        }
-        //退款请求失败
-        else {
+        } else {
+            log.info("退款请求失败");
             //TODO 变更支付订单状态（建议：update将订单状态作为查询条件，作为乐观锁），退款请求失败业务处理
             //通道订单号 responseDTO.getChannelOrderNo()
             //通道错误码：responseDTO.getErrorCode()
