@@ -60,16 +60,12 @@
 - 强大分账功能：助力您高效管理资金流，优化财务运作；
 - 专业对接团队：提供专属对接群，确保问题响应迅速，沟通顺畅无阻。
 
-若您有意接入扫码富的间联服务，请添加我的微信进行深入交流。添加时，请备注“接入扫码富”，以便我们更快为您提供服务。
+**若您有意接入扫码富的间联服务，请添加我的微信进行深入交流。添加时，请备注“接入扫码富”，以便我们更快为您提供服务。**
 
-<table style="text-align: center">
-    <tr>
-        <td><img src="https://www.helloimg.com/i/2024/10/24/6719e2918f6d2.png" width=180/>
-            <br/>
-            微信二维码
-        </td>
-    </tr>
-</table>
+| 微信二维码                                                                              |  
+|:--:|  
+|<img src="https://www.helloimg.com/i/2024/10/24/6719e2918f6d2.png" width=180/> |
+
 
 ### 直联与间联说明
 
@@ -96,10 +92,6 @@
 - 通过微信、支付宝一次性捐款 ❤
 
 
-
-<table style="text-align: center">
-    <tr>
-        <td><img src="https://www.helloimg.com/i/2024/10/23/6718ebc33da13.png" width=310/>微信</td>
-        <td><img src="https://www.helloimg.com/i/2024/10/23/6718ebc5e1d34.png" width=310/>支付宝</td>
-    </tr>
-</table>
+| 微信   | 支付宝 |  
+| :--: | :--: |  
+| <img src="https://www.helloimg.com/i/2024/10/23/6718ebc33da13.png" width=310/> | <img src="https://www.helloimg.com/i/2024/10/23/6718ebc5e1d34.png" width=310/> |
