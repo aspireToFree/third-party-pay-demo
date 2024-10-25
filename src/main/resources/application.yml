@@ -7,20 +7,31 @@ spring:
     default-property-inclusion: non_null  #返回的json数据，空字段不返回
 
 server:
-  port: 8080
-  publicAddress: http://127.0.0.1:8080 #应用公网地址
+  port: 8098
+  publicAddress: http://127.0.0.1:8098 #应用公网地址
 
 #微信参数
 wechat:
-  merchantId: 1695414135
-  privateKeyPath: E://apiclient_key.pem
-  merchantSerialNumber: 525F9C989A9A42E1C343F43E96B967ACB2CE1D51
-  apiV3Key: 1D60F50B6C69BB8A526398C00B2BD264
+  merchantId:   #微信商户号
+  privateKeyString:  #微信私钥证书字符串（与下面的微信私钥证书路径设置一个就行）
+  privateKeyPath:    #微信私钥证书路径
+  merchantSerialNumber:     #微信证书序列号
+  apiV3Key:     #微信API V3密钥
 
 #支付宝参数
 alipay:
   #serverUrl: https://openapi.alipay.com/gateway.do   #正式环境地址
   serverUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do  #沙箱环境地址
-  appId: 9021000124682441
+  appId: 9021000124682441   #支付宝沙箱环境 appId
   privateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCWhIu5wSVRe17fKcrIrUrKCQU0eYRiikPR4XkezKuA62hefFqflRMv3temdYGw9/j7dLE4pxTUR0cwbXrZI2UdjiOED+mj0n0EfLkc/fVJFPBYURLDRVsjFPYNiuOgCtGeZV3PBr7HtrA56smi1ch2kzd/4WYIX/yUDfn3eeh8t+naKttxHnoNpOEmkkLu1NYdAlaaO5W/1adym/90Z3rLNv88f1idXuUt40cVAj0SrEEp0OtLmBEs+U8dLoqlaefcboHWCk87TSnn1gnz575Qd25PpINb+QR1Ms4cm5jPV6vkI26zKJA5T89HUDMVGKawHOOIK3H/ijcHL5iCS5unAgMBAAECggEAVluL0zKW164h24Yd249ZZptQSjAiHWtYx/VGSb6B88CcrAFK+V5NmNyQ++dVVpSfXJ4yA+AQ2k5e8NEPd7+QByoDBIUgtqZQph9tEc4/SgPidblmO3TyeilPlquGN8+dPvTHor0q/mi5qTElKPDhR+7lG9DVep6fys5OCYf/NHZnszJzahJa4g9FQixOJtnrd1GyQd8rWHouP+dHuZ+SJZZwdKP5D00jk0pRJ9DTAbyxLWGKlvpiOfEDy1XaHtm0oMetmH20HFxLcVpa7+3shwcVddkwARUudco+CcPSf9xY7UnmQFaxfgkNckqIQRQ0kLve4pzduLRVJPHqKhaqoQKBgQDqqyNHoXK1Wsvy60rjyuZd5yhKcbe7tyPBhW+ywPVKpjVWztJSm+1jyHvInhxqZ5E8y/TawuLP1Bx2ztyksnf7PgBGrwIlgFLtiQdzEU3E/GyMcDKYc9QSBDLj08fm7M66XjB+W8y80RFUApgQ7uiEsNYYM4WpqkLN0UcXEhVn8QKBgQCkMyzCpGRZar1EJJG1pxmuDItkzIEevT3N63JqEOGtEA2iK8gtV6DwnvEz+vx9MxjffgKuf1HMPB3DoGyJP7JN0ywxy/KxNzhNSN14bfgKoOsCWxftFWlhc4/GvrURttxMnUaHH6q8Sbf3UFkZWUERSjn6DYzF9b59XIEWGuCVFwKBgAuuJP1lvc3lDQ20RG/+I2U9IjZCXsDLJs51E9Az5oGmsDT36mQOOsyip/aeWA+7w/Dgvfk9hgiOKDSJq1XPREWPGnhqMZMoRfhov6QsklBhuA1tcDdCXKXg65+HZQXLd6azFXrUmuYzCcfCsUr2eUBRhPaDaf296cFQz1cIoWQhAoGAfKgFQTfAn0mzqnoAzOGxUzte0AWZuRZ+R0iKMg/i5JodX5LRg+rU2hgwkf/nk70pEvL9YjByjxTMm+m8vG3JFeBN2vg0pWmAqtu4l2cVOix0ffNeNLVerYcoDgBWQr6KfPehxY+69PsaWP18xwvFpDSv0zBaQSeRmGaT8Y4yFb0CgYEA0Ai/AVK4SRpPdY24+uIEyKqRuhLTkQKLoNtXDWy5RAMojApzCLWn19o9pNpS1RU8X0LChnjrJgZdj7c9id8A05etpIjsitFl2a3Pl5BRS6LQ3r5CY20i9iyGDOaHkr58oEnqIopcdmC+gSOjNa9uTO03lEdRoZOdV/YY4tnKH+4=
   alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAr62ZMwEDimnvpHZ2qh6KeXQ++C+4mJ4rCEsz+Z0JUpEGJcYRwCwD1j2+YfyBAUhVvMHNs66FaVpNUKqpyI5NLtJ7IaoS/qv/36rLPWFjBxhX1mO/ujgOzy0r16Q4k/KYKMiwOHhjUZF/X1fl0wuTjhMohbd5FyeAedStzFdyRhUJX17NLVfkzSUEOh98cEb1NQfUwsG9h5+4gZhLZDn/pjaZtfvXqu4pKWgVwbnwXzmIYRNv9o10jbIZjVZW2JCqC7/1Etjl4FB3D9+k8GFsOvhsNRTg2gRS4rMoD2rx1dCszN7Tg/pcBM22rC5Wb/vvnaVWJ0upIDbvbPUPAD7erwIDAQAB
+
+#扫码富参数
+smf:
+  serverUrl: http://test.app.jingweitech.cn:8280   #测试环境地址
+  #serverUrl: https://smf.jingweitech.cn:8443  #正式环境地址
+  platformMercCode: MER0000000004601  #平台商户号（平台商户模式接入）  MOCK参数
+  signKey: OktTeSXNJSeq57SYNk7enBusTCQ98pelARtfVmaAA1mluAIBAO9WAPx5jDazVly6     #签名密钥
+  msgKey: lZHUSOlxaLX4DoFbfkwyU7x3jfQWlrwoWzOKIIUp5agAwG15VAYl5k11N1CwMiMe     #报文密钥
+  #agentCode:   #代理商编号（代理商模式接入）
+  tradeMercCode: MER0000000004601     #交易商户号

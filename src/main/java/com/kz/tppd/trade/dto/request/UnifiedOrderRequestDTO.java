@@ -20,7 +20,7 @@ public class UnifiedOrderRequestDTO extends BasePayRequestDTO {
     /** 买家支付宝用户ID **/
     private String buyerId;
 
-    /** openId（微信openId 或 买家支付宝用户唯一标识） **/
+    /** openId（微信openId 、 买家支付宝用户唯一标识 、 银联userId） **/
     private String openId;
 
     /** appId **/

@@ -43,7 +43,7 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
     @Value("${alipay.serverUrl}")
     private String serverUrl;
 
-    /** 支付宝appId */
+    /** 支付宝 appId */
     @Value("${alipay.appId}")
     private String appId;
 
@@ -95,6 +95,12 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         else if(PayMethodEnum.ALIPAY_APP.equals(requestDTO.getPayMethodEnum())){
             // 设置产品码
             model.setProductCode("QUICK_MSECURITY_PAY");
+
+            if(StringUtils.isNotBlank(requestDTO.getBuyerId())){
+                model.setBuyerId(requestDTO.getBuyerId());
+            } else if(StringUtils.isNotBlank(requestDTO.getOpenId())){
+                model.setBuyerOpenId(requestDTO.getOpenId());
+            }
         } else {
             throw new BaseException(CommonErrorEnum.BUSINESS_ERROR.getCode() , "支付宝通道不支持的支付方式["+requestDTO.getPayMethodEnum()+"]");
         }
@@ -105,7 +111,7 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         model.setSubject(requestDTO.getTradeDesc());
         request.setBizModel(model);
         //后台回调地址
-        request.setNotifyUrl(publicAddress + "/channel/alipayNotify/payNotify.html");
+        request.setNotifyUrl(publicAddress + "/channel/alipayNotify/payNotify");
 
         String label = "支付宝-统一下单接口";
 
@@ -264,7 +270,7 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         }
 
         //TODO 只是退款请求成功，真正的退款结果，需要另外查询
-        RefundResponseDTO refundResponseDTO = new RefundResponseDTO(ChannelStatusEnum.REQUEST_SUCCESS);
+        RefundResponseDTO refundResponseDTO = new RefundResponseDTO(ChannelStatusEnum.SUCCESS);
         //通道订单号
         refundResponseDTO.setChannelOrderNo(response.getTradeNo());
         return refundResponseDTO;
@@ -287,8 +293,8 @@ public class AlipayPayPlugin extends BaseChannelPayPlugin {
         model.setOutRequestNo(requestDTO.getOrderNo());
 
         //原支付订单号
-        model.setOutTradeNo(requestDTO.getOriginalOrderNo());
-        model.setTradeNo(requestDTO.getOriginalChannelOrderNo());
+        model.setOutTradeNo(requestDTO.getOrderNo());
+        model.setTradeNo(requestDTO.getChannelOrderNo());
 
         request.setBizModel(model);
 

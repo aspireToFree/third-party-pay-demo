@@ -6,6 +6,8 @@ import com.kz.tppd.common.enums.ChannelStatusEnum;
 import com.kz.tppd.common.enums.CommonErrorEnum;
 import com.kz.tppd.common.enums.PayMethodEnum;
 import com.kz.tppd.common.exceptions.BaseException;
+import com.kz.tppd.gateway.utils.WechatUtil;
+import com.kz.tppd.gateway.wechat.response.WechatErrorResponseCO;
 import com.kz.tppd.trade.dto.request.*;
 import com.kz.tppd.trade.dto.response.PayOrderQueryResponseDTO;
 import com.kz.tppd.trade.dto.response.RefundQueryResponseDTO;
@@ -51,6 +53,10 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
     /** 微信私钥文件路径 */
     @Value("${wechat.privateKeyPath}")
     private String privateKeyPath;
+
+    /** 微信私钥证书字符串 */
+    @Value("${wechat.privateKeyString}")
+    private String privateKeyString;
 
     /** 商户证书序列号 */
     @Value("${wechat.merchantSerialNumber}")
@@ -116,8 +122,8 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
 
         // 设置订单标题
         request.setDescription(requestDTO.getTradeDesc());
-        //后台回调地址
-        request.setNotifyUrl(publicAddress + "/channel/wechatNotify/payNotify.html");
+        //后台回调地址 最后面拼接微信商户号，回调通过微信商户号，匹配到对应商户的密钥
+        request.setNotifyUrl(publicAddress + "/channel/wechatNotify/payNotify/" + merchantId);
         // 设置商户订单号
         request.setOutTradeNo(requestDTO.getOrderNo());
 
@@ -298,6 +304,9 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
         //退款金额
         AmountReq amount = new AmountReq();
         amount.setRefund(formatAmount(requestDTO.getRefundAmount()).longValue());
+        amount.setTotal(formatAmount(requestDTO.getOriginalPayAmount()).longValue());
+        amount.setCurrency("CNY");
+
         request.setAmount(amount);
         //退款原因
         request.setReason(requestDTO.getRefundReason());
@@ -320,7 +329,17 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
         } catch (ServiceException e) { // 服务返回状态小于200或大于等于300，例如500
             // 调用e.getResponseBody()获取返回体打印日志或上报监控，更多方法见ServiceException定义
 
+            WechatErrorResponseCO wechatErrorResponseCO = WechatUtil.getWechatErrorResponseCO(e.getResponseBody());
+            if(wechatErrorResponseCO != null){
+                log.info(label + " 返回失败 {}" , e.getResponseBody());
+
+                if(StringUtils.equals(wechatErrorResponseCO.getCode() , "NOT_ENOUGH")){
+                    return new RefundResponseDTO(ChannelStatusEnum.FAIL , wechatErrorResponseCO.getCode() , "基本账户余额不足，请充值后重新发起");
+                }
+            }
+
             log.error(label + "异常" , e);
+
             //Http返回异常，先当做退款请求成功，通过退款查询来确认最终结果，防止重复退款，造成资金损失
             return new RefundResponseDTO();
         } catch (MalformedMessageException e) { // 服务返回成功，返回体类型不合法，或者解析返回体失败
@@ -348,7 +367,7 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
         }
         //TODO 只是退款请求成功，真正的退款结果，需要另外查询
         else if(StringUtils.equals(status , "PROCESSING")){
-            refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.REQUEST_SUCCESS);
+            refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.SUCCESS);
         } else if(StringUtils.equals(status , "ABNORMAL")){
             refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.FAIL);
             refundResponseDTO.setErrorCode(status);
@@ -359,7 +378,7 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
             refundResponseDTO.setErrorMessage("退款关闭");
         } else {
             //其他未知状态，通过退款查询接口，查询结果
-            refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.REQUEST_SUCCESS);
+            refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.SUCCESS);
         }
         return refundResponseDTO;
     }
@@ -391,6 +410,22 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
             response = service.queryByOutRefundNo(request);
 
             log.info(label + " 返回参数:{}", JSON.toJSONString(response));
+        } catch (ServiceException e) {
+            WechatErrorResponseCO wechatErrorResponseCO = WechatUtil.getWechatErrorResponseCO(e.getResponseBody());
+            if(wechatErrorResponseCO != null){
+                log.info(label + " 返回失败 {}" , e.getResponseBody());
+
+                if(StringUtils.equals(wechatErrorResponseCO.getCode() , "RESOURCE_NOT_EXISTS")){
+                    RefundQueryResponseDTO refundResponseDTO = new RefundQueryResponseDTO();
+                    refundResponseDTO.setChannelStatusEnum(ChannelStatusEnum.FAIL);
+                    refundResponseDTO.setErrorCode(wechatErrorResponseCO.getCode());
+                    refundResponseDTO.setErrorMessage("退款单不存在");
+                    return refundResponseDTO;
+                }
+            }
+
+            //抛出异常，不修改自己系统的业务结果
+            throw new BaseException(CommonErrorEnum.CHANNEL_ERROR, e);
         } catch (Exception e) {
             //抛出异常，不修改自己系统的业务结果
             throw new BaseException(CommonErrorEnum.CHANNEL_ERROR, e);
@@ -433,9 +468,13 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
     private Config getWechatConfig(BasePayRequestDTO basePayRequestDTO){
         //merchantId、privateKeyPath、merchantSerialNumber、apiV3Key 要弄成动态的，也可以从 requestDTO中传过来动态获取
 
+        if(StringUtils.isBlank(merchantId)){
+            throw new BaseException(CommonErrorEnum.BUSINESS_ERROR.getCode() , "请在[application.yml]配置文件中，配置微信参数");
+        }
+
         return new RSAAutoCertificateConfig.Builder()
                 .merchantId(merchantId)
-                //.privateKey(privateKey)   //私钥字符串
+                //.privateKey(privateKeyString)   //私钥字符串
                 .privateKeyFromPath(privateKeyPath) //私钥绝对路径
                 .merchantSerialNumber(merchantSerialNumber)
                 .apiV3Key(apiV3Key)

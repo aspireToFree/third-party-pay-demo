@@ -17,10 +17,4 @@ public class RefundQueryRequestDTO extends BasePayRequestDTO {
 
     /** 通道订单号 **/
     private String channelOrderNo;
-
-    /** 原支付平台订单号 **/
-    private String originalOrderNo;
-
-    /** 原通道订单号 **/
-    private String originalChannelOrderNo;
 }

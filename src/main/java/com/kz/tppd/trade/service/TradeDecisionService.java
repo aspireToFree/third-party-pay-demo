@@ -58,17 +58,19 @@ public class TradeDecisionService {
         if(PayMethodEnum.ALIPAY_MINI.equals(requestDTO.getPayMethodEnum()) ||
                 PayMethodEnum.ALIPAY_PUBLIC.equals(requestDTO.getPayMethodEnum()) ||
                 PayMethodEnum.ALIPAY_APP.equals(requestDTO.getPayMethodEnum())){
+            log.info("支付宝的支付方式写死[ALIPAY]的通道，实际业务可根据路由配置来路由通道");
             requestDTO.setChannelCode(ChannelCodeEnum.ALIPAY.getCode());
         }
         //微信走微信直联通道
         else if(PayMethodEnum.WECHAT_PUBLIC.equals(requestDTO.getPayMethodEnum()) ||
                 PayMethodEnum.WECHAT_MINI.equals(requestDTO.getPayMethodEnum()) ||
                 PayMethodEnum.WECHAT_APP.equals(requestDTO.getPayMethodEnum())){
+            log.info("微信的支付方式写死[WECHAT]的通道，实际业务可根据路由配置来路由通道");
             requestDTO.setChannelCode(ChannelCodeEnum.WECHAT.getCode());
         }
         //云闪付走扫码富间联通道
-        else if(PayMethodEnum.YSF_PUBLIC.equals(requestDTO.getPayMethodEnum()) ||
-                PayMethodEnum.YSF_MINI.equals(requestDTO.getPayMethodEnum())){
+        else if(PayMethodEnum.YSF_PUBLIC.equals(requestDTO.getPayMethodEnum())){
+            log.info("云闪付的支付方式写死[SMF]的通道，实际业务可根据路由配置来路由通道");
             requestDTO.setChannelCode(ChannelCodeEnum.SMF.getCode());
         }
 

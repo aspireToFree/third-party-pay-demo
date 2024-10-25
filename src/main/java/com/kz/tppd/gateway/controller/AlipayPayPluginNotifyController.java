@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @Controller
 @Scope("prototype")
-@RequestMapping("/channel/alipayNotify")
+@RequestMapping("/channel/alipayNotify/")
 public class AlipayPayPluginNotifyController {
 
     /** 支付宝公钥证书路径 */
@@ -46,7 +46,7 @@ public class AlipayPayPluginNotifyController {
     * @param response http response
     * Created by kz on 2019/2/14 14:50.
     */
-    @RequestMapping(value = "payNotify.html")
+    @RequestMapping(value = "payNotify")
     public void payNotify(HttpServletRequest request, HttpServletResponse response) throws Exception{
         //设置日志号
         MDC.put(BaseConstant.TRACE_LOG_ID, IDCreator.randomUUID());

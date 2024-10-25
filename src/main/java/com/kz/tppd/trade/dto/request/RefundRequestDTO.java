@@ -27,6 +27,9 @@ public class RefundRequestDTO extends BasePayRequestDTO {
     /** 原交易时间 **/
     private Date originalTradeTime;
 
+    /** 原订单支付金额 **/
+    private BigDecimal originalPayAmount;
+
     /** 退款原因 **/
     private String refundReason;
 
