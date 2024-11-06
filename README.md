@@ -64,7 +64,7 @@
 
 | 微信二维码                                                                              |  
 |:--:|  
-|<img src="https://www.helloimg.com/i/2024/10/24/6719e2918f6d2.png" width=180/> |
+|<img src="https://www.helloimg.com/i/2024/11/06/672b5ea5d7976.png" width=180/> |
 
 
 ### 直联与间联说明
