@@ -64,7 +64,7 @@
 
 | 微信二维码                                                                              |  
 |:--:|  
-|<img src="https://www.helloimg.com/i/2024/11/06/672b5ea5d7976.png" width=180/> |
+|<img src="https://gitee.com/to_free/bucket/raw/master/img/20241205/wechat_friend_code.png" width=180/> |
 
 
 ### 直联与间联说明
@@ -94,4 +94,4 @@
 
 | 微信   | 支付宝 |  
 | :--: | :--: |  
-| <img src="https://www.helloimg.com/i/2024/10/23/6718ebc33da13.png" width=310/> | <img src="https://www.helloimg.com/i/2024/10/23/6718ebc5e1d34.png" width=310/> |
+| <img src="https://gitee.com/to_free/bucket/raw/master/img/20241205/wechat_reward_code.png" width=310/> | <img src="https://gitee.com/to_free/bucket/raw/master/img/20241205/alipay_reward_code.png" width=310/> |
