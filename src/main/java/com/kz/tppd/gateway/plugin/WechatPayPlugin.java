@@ -14,7 +14,7 @@ import com.kz.tppd.trade.dto.response.RefundQueryResponseDTO;
 import com.kz.tppd.trade.dto.response.RefundResponseDTO;
 import com.kz.tppd.trade.dto.response.UnifiedOrderResponseDTO;
 import com.wechat.pay.java.core.Config;
-import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.exception.HttpException;
 import com.wechat.pay.java.core.exception.MalformedMessageException;
 import com.wechat.pay.java.core.exception.ServiceException;
@@ -53,6 +53,18 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
     /** 微信私钥文件路径 */
     @Value("${wechat.privateKeyPath}")
     private String privateKeyPath;
+
+    /** 微信公钥文件路径 */
+    @Value("${wechat.publicKeyPath}")
+    private String publicKeyPath;
+
+    /** 微信公钥证书字符串 */
+    @Value("${wechat.publicKeyString}")
+    private String publicKeyString;
+
+    /** 微信公钥ID */
+    @Value("${wechat.publicKeyId}")
+    private String publicKeyId;
 
     /** 微信私钥证书字符串 */
     @Value("${wechat.privateKeyString}")
@@ -472,13 +484,35 @@ public class WechatPayPlugin extends BaseChannelPayPlugin {
             throw new BaseException(CommonErrorEnum.BUSINESS_ERROR.getCode() , "请在[application.yml]配置文件中，配置微信参数");
         }
 
-        return new RSAAutoCertificateConfig.Builder()
+        //使用微信新的公钥模式（新入网的，强制使用这种模式）
+        RSAPublicKeyConfig.Builder builder = new RSAPublicKeyConfig.Builder()
+                .merchantId(merchantId)
+                .publicKeyId(publicKeyId)
+                .merchantSerialNumber(merchantSerialNumber)
+                .apiV3Key(apiV3Key);
+
+        if(StringUtils.isNotBlank(privateKeyPath)){
+            builder.privateKeyFromPath(privateKeyPath);
+        } else {
+            builder.privateKey(privateKeyString);
+        }
+
+        if(StringUtils.isNotBlank(publicKeyPath)){
+            builder.publicKeyFromPath(publicKeyPath);
+        } else {
+            builder.publicKey(publicKeyString);
+        }
+
+        return builder.build();
+
+        //老版本的平台证书模式
+        /*return new RSAAutoCertificateConfig.Builder()
                 .merchantId(merchantId)
                 //.privateKey(privateKeyString)   //私钥字符串
                 .privateKeyFromPath(privateKeyPath) //私钥绝对路径
                 .merchantSerialNumber(merchantSerialNumber)
                 .apiV3Key(apiV3Key)
-                .build();
+                .build();*/
     }
 
     /**

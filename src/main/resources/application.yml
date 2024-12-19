@@ -15,6 +15,9 @@ wechat:
   merchantId:   #微信商户号
   privateKeyString:  #微信私钥证书字符串（与下面的微信私钥证书路径设置一个就行）
   privateKeyPath:    #微信私钥证书路径
+  publicKeyId:       #微信公钥证书ID
+  publicKeyPath:     #微信公钥证书路径（与下面的微信公钥证书字符串设置一个就行）
+  publicKeyString:     #微信公钥证书字符串
   merchantSerialNumber:     #微信证书序列号
   apiV3Key:     #微信API V3密钥
 
