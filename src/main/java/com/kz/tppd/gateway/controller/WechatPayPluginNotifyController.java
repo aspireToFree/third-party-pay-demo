@@ -7,13 +7,14 @@ import com.kz.tppd.gateway.utils.NotifyUtil;
 import com.kz.tppd.trade.dto.response.PayOrderQueryResponseDTO;
 import com.kz.tppd.trade.service.OrderResultService;
 import com.kz.tppd.utils.IDCreator;
-import com.wechat.pay.java.core.RSAAutoCertificateConfig;
+import com.wechat.pay.java.core.RSAPublicKeyConfig;
 import com.wechat.pay.java.core.exception.ValidationException;
 import com.wechat.pay.java.core.notification.NotificationConfig;
 import com.wechat.pay.java.core.notification.NotificationParser;
 import com.wechat.pay.java.core.notification.RequestParam;
 import com.wechat.pay.java.service.partnerpayments.jsapi.model.Transaction;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -47,6 +48,18 @@ public class WechatPayPluginNotifyController {
     /** 微信私钥文件路径 */
     @Value("${wechat.privateKeyPath}")
     private String privateKeyPath;
+
+    /** 微信公钥文件路径 */
+    @Value("${wechat.publicKeyPath}")
+    private String publicKeyPath;
+
+    /** 微信公钥证书字符串 */
+    @Value("${wechat.publicKeyString}")
+    private String publicKeyString;
+
+    /** 微信公钥ID */
+    @Value("${wechat.publicKeyId}")
+    private String publicKeyId;
 
     /** 微信私钥证书字符串 */
     @Value("${wechat.privateKeyString}")
@@ -107,13 +120,7 @@ public class WechatPayPluginNotifyController {
         log.info("请求body:{}" , requestBody);
 
         //TODO 需要动态获取的话，可以通过 wechatMercCode查询对应的微信商户密钥证书
-        NotificationConfig config = new RSAAutoCertificateConfig.Builder()
-                .merchantId(merchantId)
-                //.privateKey(privateKeyString)   //私钥字符串
-                .privateKeyFromPath(privateKeyPath)
-                .merchantSerialNumber(merchantSerialNumber)
-                .apiV3Key(apiV3Key)
-                .build();
+        NotificationConfig config = getWechatConfig();
 
         // 初始化 NotificationParser
         NotificationParser parser = new NotificationParser(config);
@@ -165,5 +172,42 @@ public class WechatPayPluginNotifyController {
 
         // 处理成功，返回 200 OK 状态码
         return ResponseEntity.status(HttpStatus.OK).body("成功");
+    }
+
+    /**
+     * 初始化商户配置
+     * @return 微信公共请求参数
+     * Created by kz on 2024/9/24 11:47.
+     */
+    private NotificationConfig getWechatConfig(){
+        //使用微信新的公钥模式（新入网的，强制使用这种模式）
+        RSAPublicKeyConfig.Builder builder = new RSAPublicKeyConfig.Builder()
+                .merchantId(merchantId)
+                .publicKeyId(publicKeyId)
+                .merchantSerialNumber(merchantSerialNumber)
+                .apiV3Key(apiV3Key);
+
+        if(StringUtils.isNotBlank(privateKeyPath)){
+            builder.privateKeyFromPath(privateKeyPath);
+        } else {
+            builder.privateKey(privateKeyString);
+        }
+
+        if(StringUtils.isNotBlank(publicKeyPath)){
+            builder.publicKeyFromPath(publicKeyPath);
+        } else {
+            builder.publicKey(publicKeyString);
+        }
+
+        return builder.build();
+
+        //老版本的平台证书模式
+        /*return new RSAAutoCertificateConfig.Builder()
+                .merchantId(merchantId)
+                //.privateKey(privateKeyString)   //私钥字符串
+                .privateKeyFromPath(privateKeyPath)
+                .merchantSerialNumber(merchantSerialNumber)
+                .apiV3Key(apiV3Key)
+                .build();*/
     }
 }
