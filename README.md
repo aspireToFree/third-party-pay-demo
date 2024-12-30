@@ -40,14 +40,24 @@
 ### 参数获取
 
 - **微信OpenID获取**
-  - [微信网页授权获取OpenID官方文档](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/Wechat_webpage_authorization.html)
+  - [微信公众号获取OpenID](https://blog.csdn.net/qq_31993357/article/details/144829561)
+  - [微信小程序获取OpenID](https://blog.csdn.net/qq_31993357/article/details/144830257)
 
 
 - **支付宝user_id或open_id获取**
-  - [支付宝开放平台用户授权文档](https://opendocs.alipay.com/mini/api/openapi-authorize?pathHash=22642781)
+  - [支付宝生活号获取用户信息](https://opendocs.alipay.com/mini/02xtl8)
+  - [支付宝小程序获取用户信息](https://opendocs.alipay.com/mini/05dxgc?pathHash=1a3ecb13)
 
 
+### 直联对接
 
+- **微信直联**
+  - [微信公众号支付](https://blog.csdn.net/qq_31993357/article/details/144830049)
+  - [微信小程序支付](https://blog.csdn.net/qq_31993357/article/details/144830372)
+  
+- **支付宝直联**
+  - [支付宝生活号支付](https://blog.csdn.net/qq_31993357/article/details/144831615)
+  - [支付宝小程序支付](https://blog.csdn.net/qq_31993357/article/details/144832229)
 
 ### 扫码富平台介绍
 
